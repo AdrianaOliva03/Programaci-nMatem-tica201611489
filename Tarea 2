@@ -1,9 +1,0 @@
-# -*- coding: utf-8 -*-
-#Problema 10 Project Euler
-contador = 0
-def EsPrimo(a):
-	return not (a<2 or any (a % i == 0 for i in range(2, int(a**0.5) + 1)))
-for x in xrange(2000000):
-  if EsPrimo(x) == True:
-    contador += x
-print contador
