@@ -1,0 +1,115 @@
+# -*- coding: utf-8 -*-
+import sys
+
+def RectanguloLleno(b,h):
+  for x in range(h):
+    print ". "*(b-1) + "."
+        
+def TrianguloLleno(b):
+  for x in range(1,b+1):
+    print (x-1)*". " + "."
+
+def CuadradoLleno(l):
+  for x in range(l):
+    print ". "*(l-1) + "."
+    
+def RectanguloHueco(b,h):
+  print ". "*(b-1) + "."
+  for x in range(h-2):
+    print "." + " "*(2*b-3) + "."
+  print ". "*(b-1) + "."
+    
+def TrianguloHueco(b):
+  print "."
+  for x in range(b-2):
+    print ". " + " "*2*x + "."
+  print ". "*(b-1) + "."
+    
+def CuadradoHueco(l):
+  print ". "*(l-1) + "."
+  for x in range(l-2):
+    print "." + " "*(2*l-3) + "."
+  print ". "*(l-1) + "."
+    
+def elegirOpcion():
+  num=0
+  while True:
+    try:
+      num = int(input("Elige una opción: "))
+      correcto=True
+    except ValueError:
+      print'Error, elige una opción'
+     
+    return num
+
+def Menu():
+  while True:
+    print "¿Qué figura deseas hacer? \n (1) Cuadrado \n (2) Rectángulo \n (3) Triángulo \n (4) Salir"
+  
+    opcion = elegirOpcion()
+    if opcion == 1:
+      l = int(raw_input("Escribe la medida del lado: "))
+      print "¿Cómo quieres que sea? \n (1) Relleno \n (2) Hueco"
+      n = elegirOpcion()
+      if n == 1:
+        CuadradoLleno(l)
+        print "¿Quieres hacer otra figura?\n (1) Sí \n (2) No"
+        opcion = elegirOpcion()
+        if opcion == 1:
+          Menu()
+        elif opcion == 2:
+          break
+      elif n == 2:
+        CuadradoHueco(l)
+        print "¿Quieres hacer otra figura?\n (1) Sí \n (2) No"
+        opcion = elegirOpcion()
+        if opcion == 1:
+          Menu()
+        elif opcion == 2:
+          break         
+    elif opcion == 2:
+      b = int(raw_input("Escribe la medida de la base: "))
+      h = int(raw_input("Escribe la medida de la altura: "))
+      print "¿Cómo quieres que sea? \n (1) Relleno \n (2) Hueco"
+      n = elegirOpcion()
+      if n == 1:
+        RectanguloLleno(b, h)
+        print "¿Quieres hacer otra figura?\n (1) Sí \n (2) No"
+        opcion = elegirOpcion()
+        if opcion == 1:
+          Menu()
+        elif opcion == 2:
+          break
+      elif n == 2:
+        RectanguloHueco(b, h)
+        print "¿Quieres hacer otra figura?\n (1) Sí \n (2) No"
+        opcion = elegirOpcion()
+        if opcion == 1:
+          Menu()
+        elif opcion == 2:
+          break
+    elif opcion == 3:
+      b = int(raw_input("Escribe la medida del lado: "))
+      print "¿Cómo quieres que sea? \n (1) Relleno \n (2) Hueco"
+      n = elegirOpcion()
+      if n == 1:
+        TrianguloLleno(b)
+        print "¿Quieres hacer otra figura?\n (1) Sí \n (2) No"
+        opcion = elegirOpcion()
+        if opcion == 1:
+          Menu()
+        elif opcion == 2:
+          break
+      elif n == 2:
+        TrianguloHueco(b)
+        print "¿Quieres hacer otra figura?\n (1) Sí \n (2) No"
+        opcion = elegirOpcion()
+        if opcion == 1:
+          Menu()
+        elif opcion == 2:
+          break
+    elif opcion == 4:
+        sys.exit()
+    else:
+        print ("Introduce un numero entre 1 y 3")
+Menu()
