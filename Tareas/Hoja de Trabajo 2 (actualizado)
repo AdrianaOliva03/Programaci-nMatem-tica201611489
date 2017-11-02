@@ -1,0 +1,83 @@
+# -*- coding utf-8 -*-
+def criba_eratostenes(n):
+  l=[]
+  multiplos = set()
+  for i in range(2, n+1):
+    if i not in multiplos:
+      l.append(i)
+      multiplos.update(range(i*i, n+1, i))
+  return l
+  string.find(l)
+
+def EsPrimo(numero):
+  for i in range(2, int(numero**0.5)):
+    if (numero % i == 0):
+        return False
+  return True
+
+#Vamos a quitar los numeros que contengan un digito par o 5 porque si un numero primo tiene un numero par entre sus digitos, al menos en la rotacion en la que ese numero esta hasta la derecha, el numero se volveria par, analogamente para 5
+def ListaPrimos(x):
+  l = criba_eratostenes(x)
+  l2 = []
+  for i in l:
+    if not list(str(i)).__contains__("2") and not list(str(i)).__contains__("4") and not list(str(i)).__contains__("5") and not list(str(i)).__contains__("6") and not list(str(i)).__contains__("8") and not list(str(i)).__contains__("0") :
+      l2.append(i)
+  return l2
+
+LP = ListaPrimos(1000000)  
+#Vamos a remover los elementos de un digito de esta lista y los sumaremos al final
+LP.pop(0)   
+LP.pop(0)
+
+def Rotar(num):
+  lista = list(str(num))
+  if len(lista)==2:
+    a = str(num)
+    b = str(lista[1]+lista[0])
+    return [a, b]
+  elif len(lista) == 3:
+    a = str(num)
+    b = str(lista[1]+lista[2]+lista[0])
+    c = str(lista[2]+lista[0]+lista[1])
+    return [a,b,c]
+  elif len(lista) == 4:
+    a = str(num)
+    b = str(lista[1]+lista[2]+lista[3]+lista[0])
+    c = str(lista[2]+lista[3]+lista[0]+lista[1])
+    d = str(lista[3]+lista[0]+lista[1]+lista[2])
+    return [a,b,c,d]
+  elif len(lista) == 5:
+    a = str(num)
+    b = str(lista[1]+lista[2]+lista[3]+lista[4]+lista[0])
+    c = str(lista[2]+lista[3]+lista[4]+lista[0]+lista[1])
+    d = str(lista[3]+lista[4]+lista[0]+lista[1]+lista[2])  
+    e = str(lista[4]+lista[0]+lista[1]+lista[2]+lista[3]) 
+    return [a,b,c,d,e]
+  elif len(lista) == 6:
+    a = str(num)
+    b = str(lista[1]+lista[2]+lista[3]+lista[4]+lista[5]+lista[0])
+    c = str(lista[2]+lista[3]+lista[4]+lista[5]+lista[0]+lista[1])
+    d = str(lista[3]+lista[4]+lista[5]+lista[0]+lista[1]+lista[2])  
+    e = str(lista[4]+lista[5]+lista[0]+lista[1]+lista[2]+lista[3]) 
+    f = str(lista[5]+lista[0]+lista[1]+lista[2]+lista[3]+lista[4])
+    return [a,b,c,d,e,f]
+
+def EsCircular(n):
+  f = Rotar(n)
+  longitud = len(f)
+  suma = 0
+  for x in f:
+    if EsPrimo(int(x))==True:
+      suma += 1
+    else:
+      suma = 0
+  if int(suma) == int(longitud):
+    return True
+
+cir = []
+for j in LP:
+  if EsCircular(int(j)) == True:
+    cir.append(j)
+
+#Ahora sumamos los 4 elementos (2, 3, 5, 7) que son de una cifra
+print len(cir) + 4
