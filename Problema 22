@@ -1,0 +1,73 @@
+# -*- coding utf-8 -*-
+def Valor(nombre, i ):
+  val = 0
+
+  for x in nombre:
+    if x == "A": 
+      val += 1
+    elif x == "B": 
+      val += 2
+    elif x == "C": 
+      val += 3
+    elif x == "D": 
+      val += 4
+    elif x == "E": 
+      val += 5
+    elif x == "F": 
+      val += 6
+    elif x == "G": 
+      val += 7
+    elif x == "H": 
+      val += 8
+    elif x == "I": 
+      val += 9
+    elif x == "J": 
+      val += 10
+    elif x == "K": 
+      val += 11
+    elif x == "L": 
+      val += 12
+    elif x == "M": 
+      val += 13
+    elif x == "N": 
+      val += 14
+    elif x == "O": 
+      val += 15
+    elif x == "P": 
+      val += 16
+    elif x == "Q": 
+      val += 17
+    elif x == "R": 
+      val += 18
+    elif x == "S": 
+      val += 19
+    elif x == "T": 
+      val += 20
+    elif x == "U": 
+      val += 21
+    elif x == "V": 
+      val += 22
+    elif x == "W": 
+      val += 23
+    elif x == "X": 
+      val += 24
+    elif x == "Y": 
+      val += 25
+    elif x == "Z": 
+      val += 26
+    else: 
+      val += 0
+  return val * i
+
+archivo = open('names.txt', 'r')
+string = archivo.readlines()
+
+ns = sorted(str(string).split(","))
+total = 0
+i = 1
+
+for nombre in ns:
+    total += Valor(nombre, i)
+    i += 1
+
+print total
