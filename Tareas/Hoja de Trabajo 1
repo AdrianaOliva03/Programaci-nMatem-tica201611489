@@ -1,0 +1,20 @@
+# -*- coding utf-8 -*-
+def factorial(n):
+  if n < 2:
+    return 1
+  else:
+    result = 1
+    for i in xrange (2, n + 1):
+      result = result * i
+    return result
+
+def SumaDigitosFac(n):
+  contador = 0
+  numero = list(str(n))
+  for x in numero:
+    contador += factorial(int(x))
+  return contador
+  
+for x in xrange(3,1854721):
+  if SumaDigitosFac(x) == x:
+    print x
