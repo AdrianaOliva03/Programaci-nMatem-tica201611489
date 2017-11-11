@@ -1,0 +1,51 @@
+def verificar(a, b):
+  xor = a ^ b
+  if 32 <= xor <= 90:
+    return True
+  elif 97 <= xor <= 122:
+    return True
+  return False
+
+def describir(s, t):
+  return ''.join(chr(a ^ ord(b)) for a, b in zip(s, t))
+
+f = open('cipher.txt')
+cifra = f.read().strip().split(',')
+cifra = [int(x) for x in cifra]
+abc = xrange(97, 123)
+
+primero = set([])
+for x in abc:
+  for i in xrange(0, len(cifra), 3):
+    primero.add(x)
+    if not verificar(cifra[i], x):
+      primero.remove(x)
+      break
+
+segundo = set([])
+for x in abc:
+  for i in xrange(1, len(cifra), 3):
+    segundo.add(x)
+    if not verificar(cifra[i], x):
+      segundo.remove(x)
+      break
+
+tercero = set([])
+for x in abc:
+  for i in xrange(2, len(cifra), 3):
+    tercero.add(x)
+    if not verificar(cifra[i], x):
+      tercero.remove(x)
+      break
+
+primero = chr(list(primero)[0])
+segundo = chr(list(segundo)[0])
+tercero = chr(list(tercero)[0])
+
+llave = primero+segundo+tercero
+texto = ''
+
+for i in xrange(0, len(cifra), 3):
+  texto += describir(cifra[i:i+3], llave)
+
+print sum(map(ord, texto))
