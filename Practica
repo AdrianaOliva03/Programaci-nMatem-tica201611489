@@ -1,0 +1,265 @@
+# -*- coding: utf-8 -*-
+
+import Tkinter as tk
+from Tkconstants import BOTTOM
+import tkMessageBox
+import ttk
+import requests
+import json
+from __builtin__ import raw_input
+import socket
+
+
+usuarios = []
+archivo = open('Usuarios.txt', "r")
+for linea in archivo:
+    nombre, contrasena = linea.rstrip("\n").split(",")
+    usuarios.append([nombre, contrasena])
+archivo.close()
+
+REMOTE_SERVER = "www.google.com"
+def conectado():
+    try:
+        host = socket.gethostbyname(REMOTE_SERVER)
+        s = socket.create_connection((host, 80), 2)
+        return "La conexión a internet está disponible."
+    except:
+        pass
+        return "No hay conexión a internet."
+
+print conectado()
+
+def stateJson(l):
+    states = "https://www.ncdc.noaa.gov/cdo-web/api/v2/locations?locationcategoryid=ST&limit=51"
+    responseStates = requests.get(states , headers={'token': 'yqvvFXHGSiiWaOVyftMWpnbbPOePcRLb'})
+    
+    statesjson = responseStates.json()
+    for a in statesjson["results"] : 
+        l.append(a.get("name"))
+
+def getStions(statesStation, s):
+    url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?locationid=FIPS:"+str(statesStation)
+    
+    response = requests.get(url , headers={'token': 'yqvvFXHGSiiWaOVyftMWpnbbPOePcRLb'})
+    jso=response.json()
+    
+    if (len(jso)!=0):
+        for a in jso["results"] : 
+            s.append(a.get("name"))
+                      
+
+def allStation():
+    i = 0
+    for i in range(1,52):
+        if (i<10):
+            station = "0" + str(i)
+        else:
+            station = i
+        print station
+        getStions(station) 
+
+
+def listarEstacion(estado, estacion):
+    if (estado<10):
+            station = "0" + str(estado)
+    else:
+            station = estado
+    url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?locationid=FIPS:"+str(station)
+    token = "yqvvFXHGSiiWaOVyftMWpnbbPOePcRLb"
+    response = requests.get(url , headers={'token': 'yqvvFXHGSiiWaOVyftMWpnbbPOePcRLb'})
+    jso=response.json()
+    
+    if (len(jso)!=0):
+        atributo = jso["results"][estacion]
+        imprimir = "name: " + str (atributo ["name"])+ "\nelevation: " + str (atributo ["elevation"]) + "\nmaxdate: " + str (atributo ["maxdate"]) + "\nlongitude: " + str (atributo ["longitude"]) + "\nlatitude: " + str (atributo ["latitude"])  + "\nid: " + str (atributo ["id"]) + "\nmindate: " + str (atributo ["mindate"])
+        return imprimir
+m = []
+
+def Menu():
+    principal.destroy()
+       
+    def numero(l, c):
+        op = c.current() + 1
+        if (op<10):
+            return "0" + str(op)
+        else:
+            return op
+    
+    def consultarEstaciones():
+        tk.Label(pestana1, text='Elige una estación:').pack(side=tk.TOP)
+        estaciones = ttk.Combobox(pestana1)
+        estaciones.place(x=20,y=70)
+        es = []
+        n = numero(e, estados)
+        getStions(n, es)
+        estaciones['values'] = es
+        estaciones.pack()
+        
+        def consultaDatos():
+            o = numero(es, estaciones)
+            te = listarEstacion(int(n), int(o))
+            info = tk.Label(pestana1, text = te)
+            info.pack()
+            m.append([e[int(n)], es[int(o)]])
+    
+        boton3 = tk.Button(pestana1,text="Consultar", command = consultaDatos)
+        boton3.pack()
+        
+        
+    Menu = tk.Tk()
+    
+    Menu.geometry('500x300')
+    Menu.title("Menú principal")
+     
+    barra = ttk.Notebook(Menu)
+    pestana1 = ttk.Frame(barra)
+    pestana2 = ttk.Frame(barra)
+    pestana3 = ttk.Frame(barra)
+    pestana4 = ttk.Frame(barra)
+    pestana5 = ttk.Frame(barra)
+    barra.add(pestana1, text='Estaciones \n NOAA')
+    barra.add(pestana2, text='Datos \n por ciudad')
+    barra.add(pestana3, text='Tabla de \n estaciones visitadas')
+    barra.add(pestana4, text='Gráfico ciudades \n consultadas')
+    barra.add(pestana5, text='Historial de \n búsqueda')
+    barra.pack()
+     
+    Salir = tk.Button(
+        Menu,
+        text="Salir",
+        command=quit)
+    Salir.pack()
+    
+    tk.Label(pestana1, text='Elige un estado').pack(side=tk.TOP)
+    estados = ttk.Combobox(pestana1)
+    estados.place(x=20,y=50)
+    e = []
+    stateJson(e)
+    estados['values'] = e
+    estados.pack()
+    boton2 = tk.Button(pestana1,text="Ver estaciones", command = consultarEstaciones)
+    boton2.pack()
+    
+    tk.Label(Menu, text = conectado()).pack(side = tk.BOTTOM)
+      
+    tk.mainloop()
+
+def hacerEntrada(padre, nombre, width=None, **options):
+    tk.Label(padre, text=nombre).pack(side=tk.TOP)
+    entry = tk.Entry(padre, **options)
+    if width:
+        entry.config(width=width)
+    entry.pack(side=tk.TOP, padx=10, fill=tk.BOTH)
+    return entry
+
+def revisarUsuario():
+    if [user.get(), password.get()] in usuarios:
+        tkMessageBox.showinfo( 'Bienvenido(a)','Has ingresado exitosamente.')
+        Menu()
+    else:
+        tkMessageBox.showerror('Error','Datos incorrectos')
+   
+def registro():
+    registrov = tk.Tk()
+    w = 250 
+    h = 170
+    ws = registrov.winfo_screenwidth() 
+    hs = registrov.winfo_screenheight()
+    x = (ws/2) - (w/2)
+    y = (hs/2) - (h/2)
+    registrov.geometry('%dx%d+%d+%d' % (w, h, x, y))
+    registrov.title('Registro')
+    padre2 = tk.Frame(registrov, padx=10, pady=10)
+    padre2.pack(fill=tk.BOTH, expand=True)
+    user = hacerEntrada(padre2, "Ingresa tu correo:", 16)
+    password = hacerEntrada(padre2, "Ingresa una contraseña:", 16, show="*")
+    
+    def UsuarioNuevo():
+        correo = user.get()
+        contrasena = password.get()
+        if correo.__contains__('@') and( correo.__contains__('.com') or correo.__contains__('.es')) :
+            for a in usuarios:
+                if correo in a[0]:
+                    tkMessageBox.showerror( 'Error','Usuario ya registrado.')
+                    registrov.destroy()
+                    break
+                else:
+                    archivo = open("Usuarios.txt", "a")
+                    archivo.write('\n')
+                    archivo.write(correo)
+                    archivo.write(',')
+                    archivo.write(contrasena)
+                    usuarios.append([correo,contrasena])
+                    tkMessageBox.showinfo('Bienvenido(a)','Te has registrado con éxito.')
+                    registrov.destroy()
+                    break
+        else:
+            tkMessageBox.showerror('Error','Datos incorrectos')
+        
+    b = tk.Button(padre2, borderwidth=4, text="Registrarme", width=10, pady=8, command=UsuarioNuevo)
+    b.pack(side=tk.BOTTOM)
+    user.focus_set()
+    
+    padre2.mainloop()
+"""    
+ventana = Tk()
+ventana.title('Consultas')
+notebook = ttk.Notebook(ventana)
+notebook.pack(fill='both', expand='yes')
+pes0 = ttk.Frame(notebook)
+pes1 = ttk.Frame(notebook)
+notebook.add(pes0, text= 'Ver Estados')
+notebook.add(pes1, text= 'Historial')
+
+ventana.geometry("300x300")
+
+def agrega():
+    lstEs.insert(END,entrada.get())
+
+def enviar():
+    archivo = open("Usuarios.txt", "a")
+    archivo.write(estados.get())
+    archivo.write('\n')
+
+texto = StringVar()
+estados = ttk.Combobox(pes0)
+estados.place(x=20,y=50)
+estados['values'] = ('Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming')
+
+boton = Button(pes0,text="Consultar",command=enviar).place(x=200,y=50)
+etiqueta= Label(pes1, textvariable=texto).place(x=0,y=10)
+
+def abrir():
+    archivo = open("Usuarios.txt", "r+")
+    contenido = archivo.read()
+    texto.insert(INSERT, contenido) 
+    archivo.close()
+
+dd = Button(pes1, text="Mostrar Historial de Estados Consultados", command=abrir).pack()
+
+texto = Text(pes1)
+texto.pack(side=RIGHT)
+texto.config(width=100,height=150)
+
+"""
+    
+principal = tk.Tk()
+w = 250 
+h = 170
+ws = principal.winfo_screenwidth() 
+hs = principal.winfo_screenheight()
+x = (ws/2) - (w/2)
+y = (hs/2) - (h/2)
+principal.geometry('%dx%d+%d+%d' % (w, h, x, y))
+principal.title('Inicio')
+padre = tk.Frame(principal, padx=10, pady=10)
+padre.pack(fill=tk.BOTH, expand=True)
+user = hacerEntrada(padre, "Correo:", 16)
+password = hacerEntrada(padre, "Contraseña:", 16, show="*")
+b = tk.Button(padre, borderwidth=4, text="Ingresar", width=10, pady=8, command=revisarUsuario)
+b.pack(side=tk.LEFT)
+user.focus_set()
+nusario = tk.Button(padre, borderwidth=4, text="Crear un nuevo usuario",width=17, pady=8, justify = "center", command = registro)
+nusario.pack(side =tk.RIGHT)
+
+padre.mainloop()
