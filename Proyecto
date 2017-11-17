@@ -1,0 +1,223 @@
+# -*- coding: utf-8 -*-
+
+from Tkinter import *
+from Tkconstants import BOTTOM
+import tkMessageBox
+import ttk
+import requests
+import json
+from __builtin__ import raw_input
+import socket
+
+#archivito = open('historial.txt', 'a')
+usuarios = []
+archivoU = open('Usuarios.txt', "r")
+for linea in archivoU:
+    nombre, contrasena = linea.rstrip("\n").split(",")
+    usuarios.append([nombre, contrasena])
+archivoU.close()
+
+usuario = []
+
+REMOTE_SERVER = "www.google.com"
+def conectado():
+    try:
+        host = socket.gethostbyname(REMOTE_SERVER)
+        s = socket.create_connection((host, 80), 2)
+        return "Hay conexión a internet"
+    except:
+        pass
+        return "No hay conexión a internet"
+
+def stateJson(l):
+    states = "https://www.ncdc.noaa.gov/cdo-web/api/v2/locations?locationcategoryid=ST&limit=51"
+    responseStates = requests.get(states , headers={'token': 'djJshyuTErOMCUaYtMqxTSwuhQCdyUNY'})
+    
+    statesjson = responseStates.json()
+    for a in statesjson["results"] : 
+        l.append(a.get("name"))
+
+def getStions(statesStation, s):
+    url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?locationid=FIPS:"+str(statesStation)
+    
+    response = requests.get(url , headers={'token': 'djJshyuTErOMCUaYtMqxTSwuhQCdyUNY'})
+    jso=response.json()
+    
+    if (len(jso)!=0):
+        for a in jso["results"] : 
+            s.append(a.get("name"))
+                      
+def allStation():
+    i = 0
+    for i in range(1,52):
+        if (i<10):
+            station = "0" + str(i)
+        else:
+            station = i
+        print station
+        getStions(station) 
+
+def listarEstacion(estado, estacion):
+    if (estado<10):
+            station = "0" + str(estado)
+    else:
+            station = estado
+    url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?locationid=FIPS:"+str(station)
+    token = "yqvvFXHGSiiWaOVyftMWpnbbPOePcRLb"
+    response = requests.get(url , headers={'token': 'djJshyuTErOMCUaYtMqxTSwuhQCdyUNY'})
+    jso=response.json()
+    
+    if (len(jso)!=0):
+        atributo = jso["results"][estacion]
+        imprimir = "name: " + str (atributo ["name"])+ "\nelevation: " + str (atributo ["elevation"]) + "\nmaxdate: " + str (atributo ["maxdate"]) + "\nlongitude: " + str (atributo ["longitude"]) + "\nlatitude: " + str (atributo ["latitude"])  + "\nid: " + str (atributo ["id"]) + "\nmindate: " + str (atributo ["mindate"])
+        return imprimir
+
+m = []
+
+def Menu():
+    principal.destroy()
+    a = '"' + usuario[0] + '.txt' +'"'
+    usuarioactual = ""
+    print a   
+    def getN(l, c):
+        op = c.current() + 1
+        if (op<10):
+            return "0" + str(op)
+        else:
+            return op
+    
+    def consultarEstaciones():
+        Label(pestana1, text='Elige una estación:').pack(side=tk.TOP)
+        estaciones = ttk.Combobox(pestana1)
+        estaciones.place(x=20,y=70)
+        es = []
+        n = getN(e, estados)
+        getStions(n, es)
+        estaciones['values'] = es
+        estaciones.pack()
+        
+        def consultaDatos():
+            o = getN(es, estaciones)
+            te = listarEstacion(int(n), int(o))
+            info = Label(pestana1, text = te)
+            info.pack()
+            e = (usuarioactual + ' ! ' + estados.get() + ':'  + estaciones.get() + '\n')
+            ar = open('historial.txt', 'a')
+            ar.write(e)
+                
+        boton3 = Button(pestana1,text="Consultar",font=("corbel"),bg="lavender blush",activebackground="seashell", cursor="hand1", command = consultaDatos)
+        boton3.pack()
+        
+    pestana1 = Tk()
+    
+    pestana1.title('Estaciones NOAA')
+    pestana1.configure(bg="misty rose")
+    w = 450 
+    h = 370
+    ws = pestana1.winfo_screenwidth() 
+    hs = pestana1.winfo_screenheight()
+    x = (ws/2) - (w/2)
+    y = (hs/2) - (h/2)
+    pestana1.geometry('%dx%d+%d+%d' % (w, h, x, y))
+    Label(pestana1, text='Elige un estado',font = ("corbel"),bg="misty rose").pack(side=TOP)
+    estados = ttk.Combobox(pestana1)
+    estados.place(x=20,y=50)
+    e = []
+    stateJson(e)
+    estados['values'] = e
+    estados.pack()
+    boton2 = Button(pestana1,text="Ver estaciones", command = consultarEstaciones,bg="lavender blush",activebackground="seashell", cursor="hand1")
+    boton2.pack()
+         
+    Label(Menu, text = conectado(),font = ("corbel")).pack()      
+    pestana1.mainloop()
+
+def hacerEntrada(padre, nombre, width=None, **options):
+    Label(padre, text=nombre,font = ("corbel"),bg="misty rose").pack(side=TOP)
+    entry = Entry(padre, **options)
+    if width:
+        entry.config(width=width)
+    entry.pack(side=TOP, padx=10, fill=BOTH)
+    return entry
+
+def revisarUsuario():
+    usuario.append(user.get())    
+    a = "C:\\Users\\home\\adriana\\Documents\\proyecto"  + user.get()
+    usuarioactual = user.get()
+            
+    if [user.get(), password.get()] in usuarios:
+        tkMessageBox.showinfo( ' ','Has ingresado correctamente')
+        Menu()
+    else:
+        tkMessageBox.showerror(' ','Datos incorrectos')
+   
+def registro():
+    registrov = Tk()
+    w = 450 
+    h = 370
+    ws = registrov.winfo_screenwidth() 
+    hs = registrov.winfo_screenheight()
+    x = (ws/2) - (w/2)
+    y = (hs/2) - (h/2)
+    registrov.geometry('%dx%d+%d+%d' % (w, h, x, y))
+    registrov.title('Registro')
+    padre2 = Frame(registrov, padx=10, pady=10, bg="misty rose")
+    padre2.pack(fill=BOTH, expand=True)
+    user = hacerEntrada(padre2, "\n \n Ingresa tu correo:", 16)
+    password = hacerEntrada(padre2, "\n \n Ingresa una contraseña:", 16, show="*")
+    
+    def agregarUsuario(correo, contrasena):        
+        archivo = open("Usuarios.txt", "a")
+        archivo.write(correo)
+        archivo.write(',')
+        archivo.write(contrasena)
+        archivo.write('\n')
+        usuarios.append([correo,contrasena])
+        tkMessageBox.showinfo(' ','Tu usuario ha sido registrado')
+        registrov.destroy()
+    
+    def UsuarioNuevo():
+        correo = user.get()
+        contrasena = password.get()
+        if correo.__contains__('@') and( correo.__contains__('.com') or correo.__contains__('.es')) :
+            if (not usuarios):
+                agregarUsuario(correo, contrasena)
+            else:
+                usuario = [correo, contrasena]
+                if (usuario in usuarios):         
+                    tkMessageBox.showerror( ' ','Este usuario ya existe')
+                    registrov.destroy()
+                else: 
+                    agregarUsuario(correo, contrasena)
+                
+        else:
+            tkMessageBox.showerror(' ','Datos incorrectos')
+        
+    b = Button(padre2, borderwidth=4, text="Registrarme",font=("corbel"),bg="lavender blush",activebackground="seashell" , width=10, pady=8, cursor = "hand1", command=UsuarioNuevo)
+    b.pack(side=BOTTOM)
+    user.focus_set()
+    
+    padre2.mainloop()
+       
+principal = Tk()
+w = 450 
+h = 370
+ws = principal.winfo_screenwidth() 
+hs = principal.winfo_screenheight()
+x = (ws/2) - (w/2)
+y = (hs/2) - (h/2)
+principal.geometry('%dx%d+%d+%d' % (w, h, x, y))
+principal.title('Inicio')
+padre = Frame(principal, padx=10, pady=10,bg="misty rose")
+padre.pack(fill=BOTH, expand=True)
+tit = Label(padre, bg="misty rose",text="\n DATOS METEOROLÓGICOS DE \n LOS ESTADOS DE ESTADOS UNIDOS \n",font = ("corbel")).pack()
+user = hacerEntrada(padre, "Correo:", 16)
+password = hacerEntrada(padre, "\n Contraseña:", 16, show="*")
+b = Button(padre, borderwidth=4, text="Ingresar", width=10, pady=8,font = ("corbel"),bg="lavender blush",activebackground="seashell", cursor = "hand1", command=revisarUsuario).pack()
+user.focus_set()
+reg = Label(padre,text="\n ¿Aún no te has registrado? \n",font = ("corbel"),bg="misty rose").pack()
+nusario = Button(padre, borderwidth=4, text="Crea un usuario",bg="lavender blush",activebackground="seashell",font = ("corbel"),width=17, pady=8, justify = "center", command = registro, cursor = "hand1")
+nusario.pack()
+c= Label(padre, text ="").pack()
+con= Label(padre, text = conectado()).pack()
+padre.mainloop()
